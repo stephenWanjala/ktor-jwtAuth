@@ -1,8 +1,13 @@
 package com.github.stephenWanjala
 
 import com.github.stephenWanjala.data.repositoryImpl.AuthRepositoryImpl
+import com.github.stephenWanjala.plugins.configureMonitoring
+import com.github.stephenWanjala.plugins.configureRouting
+import com.github.stephenWanjala.plugins.configureSecurity
+import com.github.stephenWanjala.plugins.configureSerialization
+import com.github.stephenWanjala.security.JwtService
+import com.github.stephenWanjala.security.token.TokenConfig
 import io.ktor.server.application.*
-import com.github.stephenWanjala.plugins.*
 import org.litote.kmongo.coroutine.coroutine
 import org.litote.kmongo.reactivestreams.KMongo
 
@@ -13,10 +18,18 @@ fun main(args: Array<String>): Unit =
 fun Application.module() {
     val dbName = "ktor_auth"
     val mongoPassword = System.getenv("mongoPassword")
-    val db = KMongo.createClient(connectionString = "mongodb+srv://stephenwanjala145:$mongoPassword@cluster0.eobhrxp.mongodb.net/?retryWrites=true&w=majority")
-        .coroutine.getDatabase(name = dbName)
-    val authSource =AuthRepositoryImpl(db)
-    configureSecurity()
+    val db =
+        KMongo.createClient(connectionString = "mongodb+srv://stephenwanjala145:$mongoPassword@cluster0.eobhrxp.mongodb.net/?retryWrites=true&w=majority")
+            .coroutine.getDatabase(name = dbName)
+    val authSource = AuthRepositoryImpl(db)
+    val tokenService = JwtService()
+    val tokenConfig = TokenConfig(
+        issuer = environment.config.property("jwt.issuer").getString(),
+        audience = environment.config.property("jwt.audience").getString(),
+        expiresIn = 365L * 1000L * 60L * 60L * 24L,
+        secret = System.getenv("JWT_SECRET")
+    )
+    configureSecurity(tokenConfig)
     configureMonitoring()
     configureSerialization()
     configureRouting()
