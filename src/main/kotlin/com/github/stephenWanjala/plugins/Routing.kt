@@ -4,6 +4,7 @@ import com.github.stephenWanjala.domain.repository.AuthRepository
 import com.github.stephenWanjala.routes.authenticate
 import com.github.stephenWanjala.routes.home
 import com.github.stephenWanjala.routes.signIn
+import com.github.stephenWanjala.routes.signUp
 import com.github.stephenWanjala.security.TokenService
 import com.github.stephenWanjala.security.hashing.HashingService
 import com.github.stephenWanjala.security.token.TokenConfig
@@ -17,9 +18,9 @@ fun Application.configureRouting(
     tokenConfig: TokenConfig
 ) {
     routing {
-        signIn(
-            authRepository = authRepository, hashingService = hashingService,
-            tokenService = tokenService, tokenConfig = tokenConfig
+        signUp(
+            hashingService = hashingService,
+            authRepository = authRepository
         )
 
         signIn(
