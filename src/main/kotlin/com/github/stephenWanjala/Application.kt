@@ -6,6 +6,7 @@ import com.github.stephenWanjala.plugins.configureRouting
 import com.github.stephenWanjala.plugins.configureSecurity
 import com.github.stephenWanjala.plugins.configureSerialization
 import com.github.stephenWanjala.security.JwtService
+import com.github.stephenWanjala.security.hashing.SHA256HashingService
 import com.github.stephenWanjala.security.token.TokenConfig
 import io.ktor.server.application.*
 import org.litote.kmongo.coroutine.coroutine
@@ -23,6 +24,7 @@ fun Application.module() {
             .coroutine.getDatabase(name = dbName)
     val authSource = AuthRepositoryImpl(db)
     val tokenService = JwtService()
+    val hashingService = SHA256HashingService()
     val tokenConfig = TokenConfig(
         issuer = environment.config.property("jwt.issuer").getString(),
         audience = environment.config.property("jwt.audience").getString(),
@@ -32,5 +34,9 @@ fun Application.module() {
     configureSecurity(tokenConfig)
     configureMonitoring()
     configureSerialization()
-    configureRouting()
+    configureRouting(
+        hashingService = hashingService,
+        authRepository = authSource,
+        tokenService = tokenService, tokenConfig = tokenConfig
+    )
 }
