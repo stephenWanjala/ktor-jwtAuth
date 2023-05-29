@@ -9,7 +9,7 @@ class AuthRepositoryImpl
     (db: CoroutineDatabase) : AuthRepository {
     private val users = db.getCollection<User>()
     override suspend fun findUserByUsername(username: String): User? =
-        users.findOne(User::userName eq username)
+        users.findOne(User::username eq username)
 
 
     override suspend fun createUser(user: User): Boolean = users.insertOne(user).wasAcknowledged()

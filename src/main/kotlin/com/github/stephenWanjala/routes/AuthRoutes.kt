@@ -26,7 +26,7 @@ fun Route.signUp(
             call.respond(HttpStatusCode.BadRequest)
             return@post
         }
-        val fieldsBlank = request.userName.isBlank() || request.password.isBlank()
+        val fieldsBlank = request.username.isBlank() || request.password.isBlank()
         val tooShortPassword = request.password.length < 6
 
         if (fieldsBlank) {
@@ -40,7 +40,7 @@ fun Route.signUp(
         }
         val saltedHash = hashingService.generateHash(request.password)
         val user = User(
-            userName = request.userName,
+            username = request.username,
             password = saltedHash.hash,
             salt = saltedHash.salt
         )
@@ -68,14 +68,14 @@ fun Route.signIn(
             call.respond(HttpStatusCode.BadRequest)
             return@post
         }
-        val fieldsBlank = request.userName.isBlank() || request.password.isBlank()
+        val fieldsBlank = request.username.isBlank() || request.password.isBlank()
 
         if (fieldsBlank) {
             call.respond(HttpStatusCode.Conflict, message = "Fields required")
             return@post
         }
 
-        val user = authRepository.findUserByUsername(request.userName)
+        val user = authRepository.findUserByUsername(request.username)
         if (user == null) {
             call.respond(HttpStatusCode.Conflict, message = "Incorrect Username or Password")
             return@post
@@ -89,7 +89,7 @@ fun Route.signIn(
         )
 
         if (!isValidPassword) {
-            call.respond(HttpStatusCode.Conflict, message = "Incorrect Username or Password")
+            call.respond(HttpStatusCode.Conflict, message = "Incorrect  Password")
             return@post
         }
         val token = tokenService.generateToken(
