@@ -13,4 +13,6 @@ class AuthRepositoryImpl
 
 
     override suspend fun createUser(user: User): Boolean = users.insertOne(user).wasAcknowledged()
+    override suspend fun findUserByEmail(email: String): User? =
+        users.findOne(User::email eq email)
 }
