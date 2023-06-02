@@ -1,6 +1,7 @@
 package com.github.stephenWanjala.routes
 
 import com.github.stephenWanjala.data.requests.AuthRequest
+import com.github.stephenWanjala.data.requests.SignUpRequest
 import com.github.stephenWanjala.data.responses.AuthResponse
 import com.github.stephenWanjala.domain.models.User
 import com.github.stephenWanjala.domain.repository.AuthRepository
@@ -22,11 +23,11 @@ fun Route.signUp(
     authRepository: AuthRepository
 ) {
     post("signup") {
-        val request = call.receiveNullable<AuthRequest>() ?: kotlin.run {
+        val request = call.receiveNullable<SignUpRequest>() ?: kotlin.run {
             call.respond(HttpStatusCode.BadRequest)
             return@post
         }
-        val fieldsBlank = request.email.isBlank() || request.password.isBlank()
+        val fieldsBlank = request.email.isBlank() || request.password.isBlank() || request.username.isBlank()
         val tooShortPassword = request.password.length < 6
 
         if (fieldsBlank) {
@@ -40,7 +41,7 @@ fun Route.signUp(
         }
         val saltedHash = hashingService.generateHash(request.password)
         val user = User(
-            username = request.email,
+            username = request.username,
             password = saltedHash.hash,
             email = request.email,
             salt = saltedHash.salt
